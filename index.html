@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panduan Interaktif Animasi Web Modern</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Deep Indigo & Vibrant Orange -->
+    <!-- Application Structure Plan: Saya merancang aplikasi ini sebagai dasbor eksplorasi tematik, bukan sekadar laporan linear. Strukturnya adalah: 1. Hero Section yang menarik perhatian. 2. Navigasi sticky untuk akses cepat ke bagian-bagian utama: Mengapa Animasi, Tren, Peralatan, Inspirasi, dan Praktik Terbaik. 3. Setiap bagian menggunakan elemen interaktif (kartu yang dapat diklik, tab, bagan) untuk menyajikan informasi. Alur ini memungkinkan pengguna untuk menjelajah secara non-linear sesuai minat mereka, membuat penyerapan informasi yang kompleks menjadi lebih mudah dan menarik. Struktur ini dipilih karena paling efektif untuk mengubah konten edukatif menjadi pengalaman yang menarik dan digerakkan oleh pengguna. -->
+    <!-- Visualization & Content Choices: 1. **Konsep Inti:** Kartu interaktif dengan ikon untuk menyoroti 'Keterlibatan', 'Penceritaan', 'Branding'. Goal: Menginformasikan. Method: HTML/CSS. Interaction: Efek hover. Justification: Visual yang cepat dan mudah dicerna. 2. **Perbandingan Tren:** Bagan Radar Chart.js untuk membandingkan tren berdasarkan 'Dampak' vs. 'Kompleksitas'. Goal: Membandingkan. Method: Chart.js Canvas. Interaction: Tooltip saat hover. Justification: Memberikan perbandingan multi-dimensi yang jelas. 3. **Peralatan Teknologi:** Bagan Bar Chart.js untuk membandingkan Pustaka JS. Goal: Membandingkan. Method: Chart.js Canvas. Interaction: Tooltip saat hover. Justification: Perbandingan langsung metrik kuantitatif. 4. **Inspirasi & Praktik Terbaik:** Galeri kartu dan daftar ber-ikon. Goal: Mengorganisir & Menginformasikan. Method: HTML/CSS/JS. Interaction: Modal klik & sakelar interaktif. Justification: Menyajikan studi kasus dan informasi padat secara terstruktur dan interaktif. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #1A1A2E; /* Deep Indigo */
+            color: #E0E0E0; /* Light Gray */
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 350px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 400px;
+            }
+        }
+        .nav-link {
+            position: relative;
+            transition: color 0.3s ease;
+        }
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -4px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #FF8C42; /* Vibrant Orange */
+            transition: width 0.3s ease;
+        }
+        .nav-link.active, .nav-link:hover {
+            color: #FF8C42; /* Vibrant Orange */
+        }
+        .nav-link.active::after, .nav-link:hover::after {
+            width: 100%;
+        }
+        .fade-in-section {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+        }
+        .fade-in-section.is-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .modal {
+            transition: opacity 0.3s ease-in-out;
+        }
+        .modal-content {
+            transition: transform 0.3s ease-in-out;
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <header id="header" class="sticky top-0 z-50 bg-gray-900/80 backdrop-blur-lg shadow-sm">
+        <div class="container mx-auto px-4">
+            <nav class="flex justify-between items-center py-4">
+                <a href="#hero" class="text-xl font-bold text-gray-100">Animasi<span class="text-orange-500">Web</span></a>
+                <div class="hidden md:flex space-x-8">
+                    <a href="#why" class="nav-link text-gray-300 font-semibold hover:text-orange-500">Mengapa</a>
+                    <a href="#trends" class="nav-link text-gray-300 font-semibold hover:text-orange-500">Tren</a>
+                    <a href="#toolbox" class="nav-link text-gray-300 font-semibold hover:text-orange-500">Peralatan</a>
+                    <a href="#inspiration" class="nav-link text-gray-300 font-semibold hover:text-orange-500">Inspirasi</a>
+                    <a href="#best-practices" class="nav-link text-gray-300 font-semibold hover:text-orange-500">Praktik Terbaik</a>
+                </div>
+                <button id="mobile-menu-button" class="md:hidden text-gray-100">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+                </button>
+            </nav>
+        </div>
+        <div id="mobile-menu" class="hidden md:hidden bg-gray-900/90 backdrop-blur-lg">
+            <a href="#why" class="block py-2 px-4 text-sm text-gray-300 hover:bg-gray-800">Mengapa</a>
+            <a href="#trends" class="block py-2 px-4 text-sm text-gray-300 hover:bg-gray-800">Tren</a>
+            <a href="#toolbox" class="block py-2 px-4 text-sm text-gray-300 hover:bg-gray-800">Peralatan</a>
+            <a href="#inspiration" class="block py-2 px-4 text-sm text-gray-300 hover:bg-gray-800">Inspirasi</a>
+            <a href="#best-practices" class="block py-2 px-4 text-sm text-gray-300 hover:bg-gray-800">Praktik Terbaik</a>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 py-8 md:py-16">
+        <section id="hero" class="text-center min-h-[60vh] flex flex-col justify-center items-center">
+            <h1 class="text-4xl md:text-6xl font-bold mb-4 leading-tight">
+                Membuka Kekuatan <span class="text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-amber-500">Gerakan</span>
+            </h1>
+            <p class="text-lg md:text-xl max-w-3xl text-gray-400">
+                Jelajahi bagaimana animasi web modern mengubah situs statis menjadi pengalaman digital yang hidup, menarik, dan tak terlupakan.
+            </p>
+        </section>
+
+        <section id="why" class="py-16 fade-in-section">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold mb-2">Mengapa Animasi Penting?</h2>
+                <p class="text-lg text-gray-400 max-w-2xl mx-auto">Animasi bukan lagi sekadar hiasan; ini adalah komponen inti dari pengalaman pengguna yang efektif, komunikasi merek, dan penceritaan digital.</p>
+            </div>
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="bg-gray-800 p-8 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 text-center transform hover:-translate-y-2">
+                    <div class="text-4xl mb-4 text-orange-500">✨</div>
+                    <h3 class="text-xl font-bold mb-2 text-gray-100">Meningkatkan Keterlibatan</h3>
+                    <p class="text-gray-400">Gerakan secara alami menarik perhatian, memandu pengguna, dan mendorong interaksi yang lebih dalam dengan konten Anda.</p>
+                </div>
+                <div class="bg-gray-800 p-8 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 text-center transform hover:-translate-y-2">
+                    <div class="text-4xl mb-4 text-orange-500">📖</div>
+                    <h3 class="text-xl font-bold mb-2 text-gray-100">Membangun Narasi</h3>
+                    <p class="text-gray-400">Gunakan animasi berbasis gulir (*scrollytelling*) untuk memandu pengguna melalui sebuah cerita, mengungkapkan informasi secara bertahap dan imersif.</p>
+                </div>
+                <div class="bg-gray-800 p-8 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 text-center transform hover:-translate-y-2">
+                    <div class="text-4xl mb-4 text-orange-500">🎨</div>
+                    <h3 class="text-xl font-bold mb-2 text-gray-100">Memperkuat Merek</h3>
+                    <p class="text-gray-400">Animasi yang khas dan konsisten menciptakan identitas merek yang mudah diingat dan menonjol di tengah keramaian digital.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="trends" class="py-16 fade-in-section">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold mb-2">Jelajahi Tren Animasi</h2>
+                <p class="text-lg text-gray-400 max-w-2xl mx-auto">Dari sentuhan halus hingga dunia 3D yang imersif, temukan tren yang membentuk masa depan web.</p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="trends-grid">
+            </div>
+            <div class="mt-12">
+                <h3 class="text-2xl font-bold text-center mb-4">Perbandingan Tren: Dampak vs. Kompleksitas</h3>
+                 <div class="chart-container bg-gray-800 p-4 rounded-xl shadow-lg">
+                    <canvas id="trendsChart"></canvas>
+                </div>
+            </div>
+            <div class="mt-12 text-center">
+                <h3 class="text-2xl font-bold mb-4">Tren Eksperimental & Masa Depan</h3>
+                <p class="text-lg text-gray-400 max-w-2xl mx-auto mb-6">Masa depan animasi web dipenuhi inovasi. Berikut beberapa tren eksperimental yang patut diperhatikan:</p>
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div class="bg-gray-800 p-6 rounded-lg shadow-md">
+                        <h4 class="font-bold text-xl mb-2 text-gray-100 flex items-center"><span class="mr-2 text-2xl text-orange-500">🤖</span> Alur Kerja Animasi Berbasis AI</h4>
+                        <p class="text-gray-400">AI mengotomatiskan tugas-tugas berulang seperti *in-betweening* dan *lip-syncing*, mempercepat alur kerja dan memberikan kebebasan kreatif lebih besar kepada seniman. Ini memungkinkan animator berfokus pada visi kreatif, sementara AI menangani aspek teknis yang padat karya.</p>
+                    </div>
+                    <div class="bg-gray-800 p-6 rounded-lg shadow-md">
+                        <h4 class="font-bold text-xl mb-2 text-gray-100 flex items-center"><span class="mr-2 text-2xl text-orange-500">🛍️</span> Animasi Interaktif & Dapat Dibeli</h4>
+                        <p class="text-gray-400">Animasi dengan *hotspot* yang dapat diklik, fungsionalitas langsung ke keranjang belanja, atau alur cerita bercabang untuk e-commerce. Ini mengubah penonton pasif menjadi partisipan aktif, meningkatkan keterlibatan dan potensi konversi.</p>
+                    </div>
+                    <div class="bg-gray-800 p-6 rounded-lg shadow-md">
+                        <h4 class="font-bold text-xl mb-2 text-gray-100 flex items-center"><span class="mr-2 text-2xl text-orange-500">📊</span> Animasi Data Langsung</h4>
+                        <p class="text-gray-400">Memvisualisasikan data *real-time* secara dinamis, seperti grafik saham di dasbor keuangan atau ketersediaan produk di platform e-commerce. Ini memberikan informasi yang selalu terbarui dan relevan secara visual.</p>
+                    </div>
+                     <div class="bg-gray-800 p-6 rounded-lg shadow-md">
+                        <h4 class="font-bold text-xl mb-2 text-gray-100 flex items-center"><span class="mr-2 text-2xl text-orange-500">📱</span> Format Video Vertikal</h4>
+                        <p class="text-gray-400">Merancang animasi khusus untuk rasio aspek 9:16, dioptimalkan untuk konsumsi *mobile-first*. Ini mengakomodasi kebiasaan pengguna modern yang lebih banyak mengakses konten melalui perangkat seluler.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="toolbox" class="py-16 fade-in-section">
+             <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold mb-2">Peralatan Animator</h2>
+                <p class="text-lg text-gray-400 max-w-2xl mx-auto">Pilih teknologi yang tepat untuk setiap pekerjaan, dari transisi sederhana hingga pengalaman 3D yang kompleks.</p>
+            </div>
+            <div>
+                <div class="flex justify-center border-b border-gray-700 mb-8">
+                    <button data-tab="css" class="tab-button py-2 px-6 text-lg font-semibold border-b-2 border-orange-500 text-orange-400">CSS</button>
+                    <button data-tab="js" class="tab-button py-2 px-6 text-lg font-semibold border-b-2 border-transparent text-gray-400 hover:text-orange-400">JavaScript</button>
+                    <button data-tab="webgl" class="tab-button py-2 px-6 text-lg font-semibold border-b-2 border-transparent text-gray-400 hover:text-orange-400">WebGL/3D</button>
+                </div>
+                <div id="tab-content">
+                </div>
+            </div>
+        </section>
+
+        <section id="inspiration" class="py-16 fade-in-section">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold mb-2">Galeri Inspirasi</h2>
+                <p class="text-lg text-gray-400 max-w-2xl mx-auto">Lihat bagaimana situs-situs pemenang penghargaan menggunakan animasi untuk menciptakan pengalaman yang luar biasa. Klik untuk detail.</p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" id="inspiration-grid">
+            </div>
+        </section>
+
+        <section id="best-practices" class="py-16 fade-in-section">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold mb-2">Praktik Terbaik</h2>
+                <p class="text-lg text-gray-400 max-w-2xl mx-auto">Animasi yang hebat tidak hanya terlihat bagus, tetapi juga berkinerja baik dan dapat diakses oleh semua orang.</p>
+            </div>
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="bg-gray-800 p-6 rounded-lg shadow-md">
+                    <h3 class="font-bold text-xl mb-3 flex items-center text-gray-100"><span class="mr-2 text-2xl text-orange-500">⚡️</span> Kinerja</h3>
+                    <ul class="list-disc list-inside space-y-2 text-gray-400">
+                        <li>Prioritaskan properti `transform` & `opacity`.</li>
+                        <li>Gunakan `requestAnimationFrame()` untuk JS.</li>
+                        <li>Hindari properti yang memicu *layout reflow*.</li>
+                        <li>Optimalkan aset seperti file Lottie.</li>
+                    </ul>
+                </div>
+                <div class="bg-gray-800 p-6 rounded-lg shadow-md">
+                    <h3 class="font-bold text-xl mb-3 flex items-center text-gray-100"><span class="mr-2 text-2xl text-orange-500">🌍</span> Aksesibilitas</h3>
+                    <ul class="list-disc list-inside space-y-2 text-gray-400">
+                        <li>Hormati `prefers-reduced-motion`.</li>
+                        <li>Hindari animasi berkedip cepat.</li>
+                        <li>Pastikan animasi tidak menghalangi konten.</li>
+                        <li>Sediakan kontrol (jeda/berhenti) untuk animasi panjang.</li>
+                    </ul>
+                </div>
+                <div class="bg-gray-800 p-6 rounded-lg shadow-md">
+                    <h3 class="font-bold text-xl mb-3 flex items-center text-gray-100"><span class="mr-2 text-2xl text-orange-500">❤️</span> Desain Berpusat Pengguna</h3>
+                    <ul class="list-disc list-inside space-y-2 text-gray-400">
+                        <li>Berikan umpan balik instan.</li>
+                        <li>Gunakan gerakan untuk memandu, bukan mengganggu.</li>
+                        <li>Pastikan setiap animasi memiliki tujuan.</li>
+                        <li>Tambahkan sentuhan kegembiraan (*delight*).</li>
+                    </ul>
+                </div>
+            </div>
+             <div class="mt-8 p-6 bg-gray-800 rounded-lg shadow-md text-center">
+                <h4 class="font-bold text-lg mb-2 text-gray-100">Demonstrasi Aksesibilitas</h4>
+                <p class="text-gray-400 mb-4">Aktifkan sakelar ini untuk mensimulasikan `prefers-reduced-motion` dan melihat bagaimana animasi di halaman ini dinonaktifkan.</p>
+                <label for="reduce-motion-toggle" class="inline-flex items-center cursor-pointer">
+                    <span class="mr-3 text-sm font-medium text-gray-300">Animasi Aktif</span>
+                    <span class="relative">
+                        <input type="checkbox" id="reduce-motion-toggle" class="sr-only peer">
+                        <div class="w-11 h-6 bg-gray-600 rounded-full peer peer-focus:ring-4 peer-focus:ring-orange-800 peer-checked:after:translate-x-full peer-checked:after:border-gray-800 after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-500 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-orange-500"></div>
+                    </span>
+                     <span class="ml-3 text-sm font-medium text-gray-300">Kurangi Gerakan</span>
+                </label>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-gray-900 text-gray-300 py-8">
+        <div class="container mx-auto px-4 text-center">
+            <p>Dibangun untuk mendemonstrasikan kekuatan animasi web.</p>
+            <p class="text-sm text-gray-500 mt-2">Sebuah Aplikasi Interaktif Single-Page.</p>
+        </div>
+    </footer>
+    
+    <div id="modal" class="modal fixed inset-0 bg-black bg-opacity-80 flex justify-center items-center p-4 z-50 opacity-0 pointer-events-none">
+        <div id="modal-content" class="modal-content bg-gray-800 rounded-lg shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto p-8 transform scale-95">
+            <button id="modal-close" class="absolute top-4 right-4 text-gray-400 hover:text-gray-100 text-3xl">&times;</button>
+            <div id="modal-body" class="text-gray-200"></div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const data = {
+                trends: [
+                    { title: "Mikro-interaksi", description: "Animasi kecil dan halus yang memberikan umpan balik instan pada tindakan pengguna, membuat UI terasa hidup dan intuitif.", icon: "👆" },
+                    { title: "Scrollytelling", description: "Elemen beranimasi saat pengguna menggulir, menciptakan pengalaman naratif yang dinamis dan menarik.", icon: "📜" },
+                    { title: "3D & Parallax", description: "Menggunakan WebGL dan efek parallax untuk menciptakan kedalaman, imersi, dan pengalaman 3D yang realistis di browser.", icon: "🧊" },
+                    { title: "Ilustrasi Animasi", description: "Menghidupkan ilustrasi dan ikon untuk mengekspresikan kepribadian merek dan menyederhanakan konsep yang kompleks.", icon: "🎨" },
+                    { title: "Animasi Minimalis", description: "Animasi yang halus dan nyaris tak terlihat yang meningkatkan UX tanpa mengganggu, selaras dengan desain minimalis.", icon: "🧘" },
+                    { title: "Tren Eksperimental", description: "Jelajahi masa depan dengan AI, AR, animasi yang dapat dibeli (*shoppable*), dan branding berbasis gerak.", icon: "🚀" }
+                ],
+                toolbox: {
+                    css: {
+                        title: "CSS: Tulang Punggung Animasi Modern",
+                        description: "Sederhana, ringan, dan seringkali diakselerasi perangkat keras. Ideal untuk transisi, transformasi, dan animasi keyframe dasar. CSS adalah titik awal yang bagus untuk menambahkan gerakan ke situs Anda dengan kinerja yang optimal.",
+                        points: [
+                            "**@keyframes**: Untuk urutan animasi yang kompleks dan terperinci.",
+                            "**Transisi**: Untuk perubahan status yang mulus dan efek hover.",
+                            "**Transformasi 3D**: Untuk menambahkan kedalaman dan perspektif.",
+                            "**Diakselerasi GPU**: Properti `transform` dan `opacity` ditangani oleh GPU, meningkatkan kinerja.",
+                            "**Media Query `prefers-reduced-motion`**: Memungkinkan penyesuaian animasi berdasarkan preferensi pengguna untuk mengurangi gerakan."
+                        ]
+                    },
+                    js: {
+                        title: "JavaScript: Kontrol & Interaktivitas Tingkat Lanjut",
+                        description: "Digunakan untuk orkestrasi animasi yang kompleks, sinkronisasi, dan interaksi yang dinamis. Pustaka seperti GSAP dan Lottie memberikan kekuatan dan fleksibilitas yang luar biasa.",
+                        points: [
+                            "**GSAP (GreenSock Animation Platform)**: Standar industri untuk kinerja, kontrol, dan fleksibilitas. Mampu menganimasikan apa pun, dari UI hingga SVG dan WebGL.",
+                            "**Lottie**: Merender animasi yang dibuat di Adobe After Effects secara *native* di web menggunakan format JSON, menghasilkan animasi vektor yang ringan dan skalabel.",
+                            "**Theatre.js**: Peralatan desain gerak profesional dengan editor urutan dan grafik, menjembatani kode dan manipulasi langsung di browser.",
+                            "**requestAnimationFrame()**: API browser untuk animasi yang lebih efisien dan lancar, menyinkronkan dengan *refresh rate* monitor.",
+                            "**Integrasi Data**: Menganimasikan visualisasi data secara dinamis berdasarkan input atau perubahan data *real-time*."
+                        ],
+                        chartData: {
+                            labels: ['GSAP', 'Lottie', 'Theatre.js', 'CSS (Vanilla)'],
+                            datasets: [{
+                                label: 'Kekuatan',
+                                data: [9, 7, 8, 5],
+                                backgroundColor: 'rgba(255, 140, 66, 0.6)', /* Vibrant Orange */
+                                borderColor: 'rgb(255, 140, 66)',
+                            }, {
+                                label: 'Kemudahan Penggunaan',
+                                data: [7, 9, 6, 8],
+                                backgroundColor: 'rgba(106, 123, 140, 0.6)', /* Desaturated Blue-Gray */
+                                borderColor: 'rgb(106, 123, 140)',
+                            }]
+                        }
+                    },
+                    webgl: {
+                        title: "WebGL/Three.js: Membawa 3D ke Browser",
+                        description: "API JavaScript untuk merender grafik 2D dan 3D interaktif tanpa plugin. Three.js adalah pustaka yang menyederhanakan WebGL, memungkinkan pengalaman 3D yang menakjubkan dan kompleks langsung di browser.",
+                        points: [
+                            "**Lingkungan 3D Imersif**: Menciptakan dunia virtual yang dapat dijelajahi.",
+                            "**Konfigurator Produk Interaktif**: Memungkinkan pengguna memutar dan menyesuaikan produk 3D.",
+                            "**Visualisasi Data 3D**: Menyajikan data kompleks dalam dimensi baru.",
+                            "**Efek Visual Sinematik**: Menambahkan efek pasca-pemrosesan seperti kedalaman bidang, kabut, dan pencahayaan realistis.",
+                            "**Interaksi Lanjutan**: Mendukung interaksi mouse, sentuhan, dan bahkan *gamepad* untuk kontrol 3D yang intuitif."
+                        ]
+                    }
+                },
+                inspiration: [
+                    { name: "Deed Delivery", features: "Animasi entri dinamis dan jalur animasi yang menelusuri rute pengiriman saat menggulir.", impact: "Menetapkan nada modern dan memperkuat metafora merek secara real-time.", color: "bg-gray-700" },
+                    { name: "Wimpy Kid", features: "Animasi karakter yang menyenangkan, status hover interaktif, transisi bagian yang dinamis (mirip halaman komik).", impact: "Menyeimbangkan branding dengan kesenangan; menjaga pengguna tetap terlibat dan memperkuat humor serta nada khas waralaba.", color: "bg-gray-700" },
+                    { name: "Poppr", features: "Parallax scrolling yang mulus, transisi warna dinamis pada kanvas gelap, WebGL interaktif, dan efek hover yang halus.", impact: "Menciptakan rasa kedalaman dan imersi; memandu mata pengguna dan menciptakan suasana yang berbeda.", color: "bg-gray-700" },
+                    { name: "Roger Junior", features: "Ilustrasi interaktif dan menyenangkan (elemen dapat diseret dan dipindahkan), animasi gulir dinamis (tipografi, garis yang digambar).", impact: "Memberikan pengalaman taktil yang mencerminkan semangat kreatif desainer; memandu perhatian ke elemen kunci.", color: "bg-gray-700" },
+                    { name: "Wildcatter LA", features: "Animasi layar pemuatan yang eksplosif (hitungan mundur dinamit), efek hover menu interaktif yang kacau, animasi tipografi yang dipicu oleh gulir.", impact: "Menciptakan nada dramatis dan berdampak tinggi; memperkuat nuansa interaktif dan kepribadian merek yang berenergi tinggi.", color: "bg-gray-700" },
+                    { name: "The Quake", features: "Animasi pergeseran lempeng tektonik yang dipicu gulir, visualisasi data seismik interaktif.", impact: "Menjelaskan konsep geologis kompleks secara visual dan menarik, meningkatkan pemahaman pengguna.", color: "bg-gray-700" },
+                    { name: "Awwwards Nominees", features: "Berbagai teknik animasi modern, dari transisi halus hingga efek WebGL yang kompleks.", impact: "Menampilkan spektrum luas kemungkinan animasi web, menginspirasi desainer dan pengembang.", color: "bg-gray-700" }
+                ]
+            };
+            
+            const trendsGrid = document.getElementById('trends-grid');
+            data.trends.forEach(trend => {
+                const card = document.createElement('div');
+                card.className = "bg-gray-800 p-6 rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300 flex items-start space-x-4";
+                card.innerHTML = `
+                    <div class="text-3xl text-orange-500">${trend.icon}</div>
+                    <div>
+                        <h3 class="font-bold text-lg mb-1 text-gray-100">${trend.title}</h3>
+                        <p class="text-gray-400 text-sm">${trend.description}</p>
+                    </div>
+                `;
+                trendsGrid.appendChild(card);
+            });
+
+            const trendsCtx = document.getElementById('trendsChart').getContext('2d');
+            new Chart(trendsCtx, {
+                type: 'radar',
+                data: {
+                    labels: ['Mikro-interaksi', 'Scrollytelling', '3D/Parallax', 'Ilustrasi Animasi', 'Minimalisme', 'Eksperimental'],
+                    datasets: [{
+                        label: 'Dampak Pengguna',
+                        data: [7, 8, 9, 7, 6, 8],
+                        fill: true,
+                        backgroundColor: 'rgba(255, 140, 66, 0.2)', /* Vibrant Orange */
+                        borderColor: 'rgb(255, 140, 66)',
+                        pointBackgroundColor: 'rgb(255, 140, 66)',
+                    }, {
+                        label: 'Kompleksitas Implementasi',
+                        data: [4, 6, 9, 5, 3, 10],
+                        fill: true,
+                        backgroundColor: 'rgba(106, 123, 140, 0.2)', /* Desaturated Blue-Gray */
+                        borderColor: 'rgb(106, 123, 140)',
+                        pointBackgroundColor: 'rgb(106, 123, 140)',
+                    }]
+                },
+                options: {
+                    maintainAspectRatio: false,
+                    scales: {
+                        r: {
+                            angleLines: { color: 'rgba(255, 255, 255, 0.1)' }, /* Lighter grid lines for dark theme */
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                            pointLabels: { font: { size: 12, color: '#E0E0E0' } }, /* Light text for labels */
+                            suggestedMin: 0,
+                            suggestedMax: 10,
+                            ticks: { color: '#A0A0A0' } /* Light text for ticks */
+                        }
+                    },
+                    plugins: {
+                        legend: { 
+                            position: 'top',
+                            labels: { color: '#E0E0E0' } /* Light text for legend */
+                        },
+                    }
+                }
+            });
+
+            const tabButtons = document.querySelectorAll('.tab-button');
+            const tabContentContainer = document.getElementById('tab-content');
+            let toolboxChart = null;
+
+            function renderTabContent(tabId) {
+                const content = data.toolbox[tabId];
+                let pointsHTML = content.points.map(point => `<li class="flex items-start"><span class="text-orange-500 mr-2 mt-1">✓</span><span class="text-gray-300">${point}</span></li>`).join('');
+                let chartHTML = '';
+
+                if(tabId === 'js') {
+                    chartHTML = `
+                        <div class="mt-8">
+                            <h4 class="text-xl font-bold text-center mb-4 text-gray-100">Perbandingan Pustaka JS</h4>
+                            <div class="chart-container bg-gray-900 p-4 rounded-xl">
+                                <canvas id="toolboxChart"></canvas>
+                            </div>
+                        </div>
+                    `;
+                }
+
+                tabContentContainer.innerHTML = `
+                    <div class="bg-gray-800 p-8 rounded-lg shadow-md">
+                        <h3 class="text-2xl font-bold mb-3 text-gray-100">${content.title}</h3>
+                        <p class="text-gray-400 mb-6">${content.description}</p>
+                        <ul class="space-y-2">${pointsHTML}</ul>
+                        ${chartHTML}
+                    </div>
+                `;
+
+                if(tabId === 'js') {
+                    const toolboxCtx = document.getElementById('toolboxChart')?.getContext('2d');
+                    if (toolboxChart) toolboxChart.destroy();
+                    if(toolboxCtx) {
+                        toolboxChart = new Chart(toolboxCtx, {
+                            type: 'bar',
+                            data: data.toolbox.js.chartData,
+                            options: {
+                                maintainAspectRatio: false,
+                                scales: {
+                                    x: {
+                                        beginAtZero: true,
+                                        max: 10,
+                                        ticks: { color: '#A0A0A0' }, /* Light text for ticks */
+                                        grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                                    },
+                                    y: {
+                                        ticks: { color: '#A0A0A0' }, /* Light text for ticks */
+                                        grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                                    }
+                                },
+                                plugins: { 
+                                    legend: { 
+                                        position: 'top',
+                                        labels: { color: '#E0E0E0' } /* Light text for legend */
+                                    } 
+                                },
+                                indexAxis: 'y',
+                            }
+                        });
+                    }
+                }
+            }
+
+            tabButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    tabButtons.forEach(btn => {
+                        btn.classList.remove('border-orange-500', 'text-orange-400');
+                        btn.classList.add('border-transparent', 'text-gray-400');
+                    });
+                    button.classList.add('border-orange-500', 'text-orange-400');
+                    button.classList.remove('border-transparent', 'text-gray-400');
+                    renderTabContent(button.dataset.tab);
+                });
+            });
+
+            renderTabContent('css');
+            
+            const inspirationGrid = document.getElementById('inspiration-grid');
+            const modal = document.getElementById('modal');
+            const modalBody = document.getElementById('modal-body');
+            const modalClose = document.getElementById('modal-close');
+            
+            data.inspiration.forEach(item => {
+                const card = document.createElement('div');
+                card.className = `p-6 rounded-lg shadow-md cursor-pointer hover:shadow-xl hover:-translate-y-1 transition-all duration-300 ${item.color} text-gray-100`;
+                card.innerHTML = `<h3 class="font-bold text-xl">${item.name}</h3>`;
+                card.addEventListener('click', () => {
+                    modalBody.innerHTML = `
+                        <h2 class="text-3xl font-bold mb-4 text-gray-100">${item.name}</h2>
+                        <h4 class="font-semibold text-lg mb-2 text-gray-200">Fitur Animasi Unggulan:</h4>
+                        <p class="text-gray-300 mb-4">${item.features}</p>
+                        <h4 class="font-semibold text-lg mb-2 text-gray-200">Dampak pada Pengalaman Pengguna:</h4>
+                        <p class="text-gray-300">${item.impact}</p>
+                    `;
+                    modal.classList.remove('opacity-0', 'pointer-events-none');
+                    document.getElementById('modal-content').classList.remove('scale-95');
+                });
+                inspirationGrid.appendChild(card);
+            });
+            
+            modalClose.addEventListener('click', () => {
+                modal.classList.add('opacity-0', 'pointer-events-none');
+                document.getElementById('modal-content').classList.add('scale-95');
+            });
+            
+            modal.addEventListener('click', (e) => {
+                if(e.target === modal) {
+                    modal.classList.add('opacity-0', 'pointer-events-none');
+                    document.getElementById('modal-content').classList.add('scale-95');
+                }
+            });
+
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenuButton.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+            });
+
+            const reduceMotionToggle = document.getElementById('reduce-motion-toggle');
+            reduceMotionToggle.addEventListener('change', (e) => {
+                document.body.classList.toggle('reduce-motion', e.target.checked);
+                if(e.target.checked) {
+                    document.documentElement.style.setProperty('--transition-duration', '0s');
+                } else {
+                    document.documentElement.style.setProperty('--transition-duration', '0.3s');
+                }
+            });
+            const style = document.createElement('style');
+            style.innerHTML = `
+                .reduce-motion, .reduce-motion * {
+                   animation-duration: 0.01ms !important;
+                   animation-iteration-count: 1 !important;
+                   transition-duration: 0.01ms !important;
+                   scroll-behavior: auto !important;
+                   transform: none !important;
+                }
+            `;
+            document.head.appendChild(style);
+            document.body.classList.remove('reduce-motion');
+
+            const sections = document.querySelectorAll('.fade-in-section');
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('is-visible');
+                    }
+                });
+            }, { threshold: 0.1 });
+            sections.forEach(section => observer.observe(section));
+            
+            const navLinks = document.querySelectorAll('.nav-link');
+            const navSections = Array.from(navLinks).map(link => document.querySelector(link.getAttribute('href')));
+
+            window.addEventListener('scroll', () => {
+                let current = '';
+                navSections.forEach(section => {
+                    const sectionTop = section.offsetTop;
+                    if (pageYOffset >= sectionTop - 100) {
+                        current = section.getAttribute('id');
+                    }
+                });
+                
+                navLinks.forEach(link => {
+                    link.classList.remove('active');
+                    if (link.getAttribute('href').substring(1) === current) {
+                        link.classList.add('active');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
