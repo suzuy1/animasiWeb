@@ -9,6 +9,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <!-- Chosen Palette: Deep Indigo & Vibrant Orange -->
     <!-- Application Structure Plan: Saya merancang aplikasi ini sebagai dasbor eksplorasi tematik, bukan sekadar laporan linear. Strukturnya adalah: 1. Hero Section yang menarik perhatian. 2. Navigasi sticky untuk akses cepat ke bagian-bagian utama: Mengapa Animasi, Tren, Peralatan, Inspirasi, dan Praktik Terbaik. 3. Setiap bagian menggunakan elemen interaktif (kartu yang dapat diklik, tab, bagan) untuk menyajikan informasi. Alur ini memungkinkan pengguna untuk menjelajah secara non-linear sesuai minat mereka, membuat penyerapan informasi yang kompleks menjadi lebih mudah dan menarik. Struktur ini dipilih karena paling efektif untuk mengubah konten edukatif menjadi pengalaman yang menarik dan digerakkan oleh pengguna. -->
     <!-- Visualization & Content Choices: 1. **Konsep Inti:** Kartu interaktif dengan ikon untuk menyoroti 'Keterlibatan', 'Penceritaan', 'Branding'. Goal: Menginformasikan. Method: HTML/CSS. Interaction: Efek hover. Justification: Visual yang cepat dan mudah dicerna. 2. **Perbandingan Tren:** Bagan Radar Chart.js untuk membandingkan tren berdasarkan 'Dampak' vs. 'Kompleksitas'. Goal: Membandingkan. Method: Chart.js Canvas. Interaction: Tooltip saat hover. Justification: Memberikan perbandingan multi-dimensi yang jelas. 3. **Peralatan Teknologi:** Bagan Bar Chart.js untuk membandingkan Pustaka JS. Goal: Membandingkan. Method: Chart.js Canvas. Interaction: Tooltip saat hover. Justification: Perbandingan langsung metrik kuantitatif. 4. **Inspirasi & Praktik Terbaik:** Galeri kartu dan daftar ber-ikon. Goal: Mengorganisir & Menginformasikan. Method: HTML/CSS/JS. Interaction: Modal klik & sakelar interaktif. Justification: Menyajikan studi kasus dan informasi padat secara terstruktur dan interaktif. -->
@@ -73,9 +75,7 @@
             opacity: 1;
             transform: translateY(0);
         }
-        .hero-paragraph.is-visible {
-            transition-delay: 0.2s; /* Delay paragraph after title */
-        }
+        /* Removed specific delay from CSS, now controlled by JS for better sync with typing */
 
         /* Section title animation */
         .section-title {
@@ -109,14 +109,48 @@
         #back-to-top {
             transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
         }
+
+        /* Typing animation cursor */
+        @keyframes blink-caret {
+            from, to { border-color: transparent }
+            50% { border-color: #FF8C42; } /* Vibrant Orange cursor */
+        }
+
+        /* Demo specific styles */
+        .demo-button {
+            transition: all 0.2s ease-in-out;
+        }
+        .demo-button:active {
+            transform: scale(0.95);
+            background-color: #FF6F00; /* Darker orange on click */
+        }
+        .demo-icon-spin:hover {
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        .hidden-text {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease-out;
+        }
+        .hidden-text.expanded {
+            max-height: 100px; /* Adjust as needed */
+        }
+        .trend-icon-hover:hover {
+            transform: scale(1.1);
+            transition: transform 0.2s ease-in-out;
+        }
     </style>
 </head>
 <body class="antialiased">
 
     <header id="header" class="sticky top-0 z-50 bg-gray-900/80 backdrop-blur-lg shadow-sm">
         <div class="container mx-auto px-4">
-            <nav class="flex justify-between items-center py-4">
-                <a href="#hero" class="text-xl font-bold text-gray-100">Animasi<span class="text-orange-500">Web</span></a>
+            <nav class="flex justify-between items-center py-7">
+                <a href="#hero" class="text-3xl font-bold text-gray-100">Animasi<span class="text-orange-500">Web</span></a>
                 <div class="hidden md:flex space-x-8">
                     <a href="#why" class="nav-link text-gray-300 font-semibold hover:text-orange-500">Mengapa</a>
                     <a href="#trends" class="nav-link text-gray-300 font-semibold hover:text-orange-500">Tren</a>
@@ -140,9 +174,7 @@
 
     <main class="container mx-auto px-4 py-8 md:py-16">
         <section id="hero" class="text-center min-h-[60vh] flex flex-col justify-center items-center">
-            <h1 class="text-4xl md:text-6xl font-bold mb-4 leading-tight hero-title">
-                Membuka Kekuatan <span class="text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-amber-500">Gerakan</span>
-            </h1>
+            <h1 id="typing-hero-title" class="text-5xl md:text-6xl font-bold mb-3 leading-tight hero-title"></h1>
             <p class="text-lg md:text-xl max-w-3xl text-gray-400 hero-paragraph">
                 Jelajahi bagaimana animasi web modern mengubah situs statis menjadi pengalaman digital yang hidup, menarik, dan tak terlupakan.
             </p>
@@ -154,20 +186,41 @@
                 <p class="text-lg text-gray-400 max-w-2xl mx-auto">Animasi bukan lagi sekadar hiasan; ini adalah komponen inti dari pengalaman pengguna yang efektif, komunikasi merek, dan penceritaan digital.</p>
             </div>
             <div class="grid md:grid-cols-3 gap-8">
-                <div class="bg-gray-800 p-8 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 text-center transform hover:-translate-y-2">
-                    <div class="text-4xl mb-4 text-orange-500">✨</div>
+                <!-- Meningkatkan Keterlibatan Card -->
+                <div class="bg-gray-800 p-8 rounded-3xl shadow-lg hover:shadow-xl transition-shadow duration-300 text-center transform hover:-translate-y-2">
+                    <div class="text-4xl mb-4 text-orange-500"><i class="fa-solid fa-star"></i></div>
                     <h3 class="text-xl font-bold mb-2 text-gray-100">Meningkatkan Keterlibatan</h3>
                     <p class="text-gray-400">Gerakan secara alami menarik perhatian, memandu pengguna, dan mendorong interaksi yang lebih dalam dengan konten Anda.</p>
+                    <div class="mt-4">
+                        <button id="engagement-demo-btn" class="bg-orange-500 text-white px-6 py-2 rounded-full font-semibold hover:bg-orange-600 demo-button">
+                            Coba Interaksi!
+                        </button>
+                    </div>
                 </div>
-                <div class="bg-gray-800 p-8 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 text-center transform hover:-translate-y-2">
-                    <div class="text-4xl mb-4 text-orange-500">📖</div>
+                <!-- Membangun Narasi Card -->
+                <div class="bg-gray-800 p-8 rounded-3xl shadow-lg hover:shadow-xl transition-shadow duration-300 text-center transform hover:-translate-y-2">
+                    <div class="text-4xl mb-4 text-orange-500"><i class="fa-solid fa-scroll"></i></div>
                     <h3 class="text-xl font-bold mb-2 text-gray-100">Membangun Narasi</h3>
                     <p class="text-gray-400">Gunakan animasi berbasis gulir (*scrollytelling*) untuk memandu pengguna melalui sebuah cerita, mengungkapkan informasi secara bertahap dan imersif.</p>
+                    <div class="mt-4">
+                        <button id="narrative-demo-btn" class="bg-gray-700 text-gray-200 px-6 py-2 rounded-full font-semibold hover:bg-gray-600 demo-button">
+                            Baca Lebih Lanjut
+                        </button>
+                        <p id="narrative-hidden-text" class="hidden-text text-gray-400 text-sm mt-2">
+                            Animasi dapat mengubah data kompleks menjadi narasi visual yang mudah dicerna, seperti grafik yang berkembang seiring guliran atau peta yang menunjukkan perjalanan.
+                        </p>
+                    </div>
                 </div>
-                <div class="bg-gray-800 p-8 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 text-center transform hover:-translate-y-2">
-                    <div class="text-4xl mb-4 text-orange-500">🎨</div>
+                <!-- Memperkuat Merek Card -->
+                <div class="bg-gray-800 p-8 rounded-3xl shadow-lg hover:shadow-xl transition-shadow duration-300 text-center transform hover:-translate-y-2">
+                    <div class="text-4xl mb-4 text-orange-500">
+                        <i class="fa-solid fa-palette demo-icon-spin"></i>
+                    </div>
                     <h3 class="text-xl font-bold mb-2 text-gray-100">Memperkuat Merek</h3>
                     <p class="text-gray-400">Animasi yang khas dan konsisten menciptakan identitas merek yang mudah diingat dan menonjol di tengah keramaian digital.</p>
+                    <div class="mt-4 text-gray-400 text-sm">
+                        *Arahkan kursor ke ikon di atas!*
+                    </div>
                 </div>
             </div>
         </section>
@@ -189,20 +242,20 @@
                 <h3 class="text-2xl font-bold mb-4 section-title">Tren Eksperimental & Masa Depan</h3>
                 <p class="text-lg text-gray-400 max-w-2xl mx-auto mb-6">Masa depan animasi web dipenuhi inovasi. Berikut beberapa tren eksperimental yang patut diperhatikan:</p>
                 <div class="grid md:grid-cols-2 gap-8">
-                    <div class="bg-gray-800 p-6 rounded-lg shadow-md">
-                        <h4 class="font-bold text-xl mb-2 text-gray-100 flex items-center"><span class="mr-2 text-2xl text-orange-500">🤖</span> Alur Kerja Animasi Berbasis AI</h4>
+                    <div class="bg-gray-800 p-6 rounded-3xl shadow-md">
+                        <h4 class="font-bold text-xl mb-2 text-gray-100 flex items-center"><span class="mr-2 text-2xl text-orange-500"><i class="fa-solid fa-robot"></i></span> Alur Kerja Animasi Berbasis AI</h4>
                         <p class="text-gray-400">AI mengotomatiskan tugas-tugas berulang seperti *in-betweening* dan *lip-syncing*, mempercepat alur kerja dan memberikan kebebasan kreatif lebih besar kepada seniman. Ini memungkinkan animator berfokus pada visi kreatif, sementara AI menangani aspek teknis yang padat karya.</p>
                     </div>
-                    <div class="bg-gray-800 p-6 rounded-lg shadow-md">
-                        <h4 class="font-bold text-xl mb-2 text-gray-100 flex items-center"><span class="mr-2 text-2xl text-orange-500">🛍️</span> Animasi Interaktif & Dapat Dibeli</h4>
+                    <div class="bg-gray-800 p-6 rounded-3xl shadow-md">
+                        <h4 class="font-bold text-xl mb-2 text-gray-100 flex items-center"><span class="mr-2 text-2xl text-orange-500"><i class="fa-solid fa-bag-shopping"></i></span> Animasi Interaktif & Dapat Dibeli</h4>
                         <p class="text-gray-400">Animasi dengan *hotspot* yang dapat diklik, fungsionalitas langsung ke keranjang belanja, atau alur cerita bercabang untuk e-commerce. Ini mengubah penonton pasif menjadi partisipan aktif, meningkatkan keterlibatan dan potensi konversi.</p>
                     </div>
-                    <div class="bg-gray-800 p-6 rounded-lg shadow-md">
-                        <h4 class="font-bold text-xl mb-2 text-gray-100 flex items-center"><span class="mr-2 text-2xl text-orange-500">📊</span> Animasi Data Langsung</h4>
+                    <div class="bg-gray-800 p-6 rounded-3xl shadow-md">
+                        <h4 class="font-bold text-xl mb-2 text-gray-100 flex items-center"><span class="mr-2 text-2xl text-orange-500"><i class="fa-solid fa-chart-line"></i></span> Animasi Data Langsung</h4>
                         <p class="text-gray-400">Memvisualisasikan data *real-time* secara dinamis, seperti grafik saham di dasbor keuangan atau ketersediaan produk di platform e-commerce. Ini memberikan informasi yang selalu terbarui dan relevan secara visual.</p>
                     </div>
-                     <div class="bg-gray-800 p-6 rounded-lg shadow-md">
-                        <h4 class="font-bold text-xl mb-2 text-gray-100 flex items-center"><span class="mr-2 text-2xl text-orange-500">📱</span> Format Video Vertikal</h4>
+                     <div class="bg-gray-800 p-6 rounded-3xl shadow-md">
+                        <h4 class="font-bold text-xl mb-2 text-gray-100 flex items-center"><span class="mr-2 text-2xl text-orange-500"><i class="fa-solid fa-mobile-screen-button"></i></span> Format Video Vertikal</h4>
                         <p class="text-gray-400">Merancang animasi khusus untuk rasio aspek 9:16, dioptimalkan untuk konsumsi *mobile-first*. Ini mengakomodasi kebiasaan pengguna modern yang lebih banyak mengakses konten melalui perangkat seluler.</p>
                     </div>
                 </div>
@@ -241,7 +294,7 @@
             </div>
             <div class="grid md:grid-cols-3 gap-8">
                 <div class="bg-gray-800 p-6 rounded-lg shadow-md">
-                    <h3 class="font-bold text-xl mb-3 flex items-center text-gray-100"><span class="mr-2 text-2xl text-orange-500">⚡️</span> Kinerja</h3>
+                    <h3 class="font-bold text-xl mb-3 flex items-center text-gray-100"><span class="mr-2 text-2xl text-orange-500"><i class="fa-solid fa-bolt"></i></span> Kinerja</h3>
                     <ul class="list-disc list-inside space-y-2 text-gray-400">
                         <li>Prioritaskan properti `transform` & `opacity`.</li>
                         <li>Gunakan `requestAnimationFrame()` untuk JS.</li>
@@ -250,7 +303,7 @@
                     </ul>
                 </div>
                 <div class="bg-gray-800 p-6 rounded-lg shadow-md">
-                    <h3 class="font-bold text-xl mb-3 flex items-center text-gray-100"><span class="mr-2 text-2xl text-orange-500">🌍</span> Aksesibilitas</h3>
+                    <h3 class="font-bold text-xl mb-3 flex items-center text-gray-100"><span class="mr-2 text-2xl text-orange-500"><i class="fa-solid fa-universal-access"></i></span> Aksesibilitas</h3>
                     <ul class="list-disc list-inside space-y-2 text-gray-400">
                         <li>Hormati `prefers-reduced-motion`.</li>
                         <li>Hindari animasi berkedip cepat.</li>
@@ -259,7 +312,7 @@
                     </ul>
                 </div>
                 <div class="bg-gray-800 p-6 rounded-lg shadow-md">
-                    <h3 class="font-bold text-xl mb-3 flex items-center text-gray-100"><span class="mr-2 text-2xl text-orange-500">❤️</span> Desain Berpusat Pengguna</h3>
+                    <h3 class="font-bold text-xl mb-3 flex items-center text-gray-100"><span class="mr-2 text-2xl text-orange-500"><i class="fa-solid fa-heart"></i></span> Desain Berpusat Pengguna</h3>
                     <ul class="list-disc list-inside space-y-2 text-gray-400">
                         <li>Berikan umpan balik instan.</li>
                         <li>Gunakan gerakan untuk memandu, bukan mengganggu.</li>
@@ -306,12 +359,12 @@
         document.addEventListener('DOMContentLoaded', () => {
             const data = {
                 trends: [
-                    { title: "Mikro-interaksi", description: "Animasi kecil dan halus yang memberikan umpan balik instan pada tindakan pengguna, membuat UI terasa hidup dan intuitif.", icon: "👆" },
-                    { title: "Scrollytelling", description: "Elemen beranimasi saat pengguna menggulir, menciptakan pengalaman naratif yang dinamis dan menarik.", icon: "📜" },
-                    { title: "3D & Parallax", description: "Menggunakan WebGL dan efek parallax untuk menciptakan kedalaman, imersi, dan pengalaman 3D yang realistis di browser.", icon: "🧊" },
-                    { title: "Ilustrasi Animasi", description: "Menghidupkan ilustrasi dan ikon untuk mengekspresikan kepribadian merek dan menyederhanakan konsep yang kompleks.", icon: "🎨" },
-                    { title: "Animasi Minimalis", description: "Animasi yang halus dan nyaris tak terlihat yang meningkatkan UX tanpa mengganggu, selaras dengan desain minimalis.", icon: "🧘" },
-                    { title: "Tren Eksperimental", description: "Jelajahi masa depan dengan AI, AR, animasi yang dapat dibeli (*shoppable*), dan branding berbasis gerak.", icon: "🚀" }
+                    { title: "Mikro-interaksi", description: "Animasi kecil dan halus yang memberikan umpan balik instan pada tindakan pengguna, membuat UI terasa hidup dan intuitif.", icon: "fa-solid fa-hand-pointer" },
+                    { title: "Scrollytelling", description: "Elemen beranimasi saat pengguna menggulir, menciptakan pengalaman naratif yang dinamis dan menarik.", icon: "fa-solid fa-scroll" },
+                    { title: "3D & Parallax", description: "Menggunakan WebGL dan efek parallax untuk menciptakan kedalaman, imersi, dan pengalaman 3D yang realistis di browser.", icon: "fa-solid fa-cube" },
+                    { title: "Ilustrasi Animasi", description: "Menghidupkan ilustrasi dan ikon untuk mengekspresikan kepribadian merek dan menyederhanakan konsep yang kompleks.", icon: "fa-solid fa-brush" },
+                    { title: "Animasi Minimalis", description: "Animasi yang halus dan nyaris tak terlihat yang meningkatkan UX tanpa mengganggu, selaras dengan desain minimalis.", icon: "fa-solid fa-leaf" },
+                    { title: "Tren Eksperimental", description: "Jelajahi masa depan dengan AI, AR, animasi yang dapat dibeli (*shoppable*), dan branding berbasis gerak.", icon: "fa-solid fa-rocket" }
                 ],
                 toolbox: {
                     css: {
@@ -378,7 +431,7 @@
                 const card = document.createElement('div');
                 card.className = "bg-gray-800 p-6 rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300 flex items-start space-x-4";
                 card.innerHTML = `
-                    <div class="text-3xl text-orange-500">${trend.icon}</div>
+                    <div class="text-3xl mb-4 text-orange-500"><i class="${trend.icon} trend-icon-hover"></i></div>
                     <div>
                         <h3 class="font-bold text-lg mb-1 text-gray-100">${trend.title}</h3>
                         <p class="text-gray-400 text-sm">${trend.description}</p>
@@ -569,13 +622,53 @@
             document.head.appendChild(style);
             document.body.classList.remove('reduce-motion');
 
+            // Typing animation for hero title
+            const heroTitleElement = document.getElementById('typing-hero-title');
+            const staticText = "Membuka Kekuatan ";
+            const animatedPart = "<span class='text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-amber-500'>Gerakan</span>";
+            
+            let charIndex = 0;
+            let typingInterval;
+
+            function typeCharacter() {
+                if (charIndex < staticText.length) {
+                    heroTitleElement.innerHTML += staticText.charAt(charIndex);
+                    charIndex++;
+                } else {
+                    // Once static text is typed, add the animated part and stop typing
+                    heroTitleElement.innerHTML = staticText + animatedPart; // Set full HTML at once
+                    clearInterval(typingInterval);
+                    heroTitleElement.style.borderRight = 'none'; // Remove blinking cursor
+                    heroTitleElement.style.animation = 'none'; // Stop blinking animation
+                    return;
+                }
+            }
+
             // Hero section animation on load
-            const heroTitle = document.querySelector('.hero-title');
+            const heroTitle = document.querySelector('.hero-title'); // This will be the h1 with typing-hero-title ID
             const heroParagraph = document.querySelector('.hero-paragraph');
+
             setTimeout(() => {
+                // Make the hero title element visible (fade-in)
                 heroTitle.classList.add('is-visible');
-                heroParagraph.classList.add('is-visible');
-            }, 100); // Small delay to ensure CSS is applied
+
+                // After the fade-in transition (0.8s), start typing
+                setTimeout(() => {
+                    heroTitleElement.innerHTML = ''; // Clear content before typing
+                    heroTitleElement.style.borderRight = '2px solid #FF8C42'; // Add blinking cursor
+                    heroTitleElement.style.animation = 'blink-caret .75s step-end infinite';
+                    typingInterval = setInterval(typeCharacter, 80); // Start typing
+                }, 800); // Delay after hero-title fade-in
+
+                // Paragraph animation can start slightly after the typing begins or ends
+                // Let's adjust its delay to be after the typing animation is mostly done.
+                // Static text length 17 chars * 80ms/char = 1360ms = 1.36s
+                // Total delay for paragraph = initial heroTitle fade-in (0.8s) + typing duration (1.36s) + a small buffer (0.2s) = 2.36s
+                setTimeout(() => {
+                    heroParagraph.classList.add('is-visible');
+                }, 2360); // Adjust paragraph delay
+            }, 100); // Initial delay for hero section elements to start fading in
+
 
             // Intersection Observer for fade-in sections and section titles
             const sections = document.querySelectorAll('.fade-in-section');
@@ -643,6 +736,37 @@
                     behavior: 'smooth'
                 });
             });
+
+            // --- Interactive Demos Logic ---
+
+            // 1. Meningkatkan Keterlibatan Demo
+            const engagementDemoBtn = document.getElementById('engagement-demo-btn');
+            if (engagementDemoBtn) {
+                engagementDemoBtn.addEventListener('click', () => {
+                    engagementDemoBtn.textContent = 'Berhasil!';
+                    engagementDemoBtn.classList.remove('bg-orange-500', 'hover:bg-orange-600');
+                    engagementDemoBtn.classList.add('bg-green-500', 'hover:bg-green-600');
+                    setTimeout(() => {
+                        engagementDemoBtn.textContent = 'Coba Interaksi!';
+                        engagementDemoBtn.classList.remove('bg-green-500', 'hover:bg-green-600');
+                        engagementDemoBtn.classList.add('bg-orange-500', 'hover:bg-orange-600');
+                    }, 1500);
+                });
+            }
+
+            // 2. Membangun Narasi Demo
+            const narrativeDemoBtn = document.getElementById('narrative-demo-btn');
+            const narrativeHiddenText = document.getElementById('narrative-hidden-text');
+            if (narrativeDemoBtn && narrativeHiddenText) {
+                narrativeDemoBtn.addEventListener('click', () => {
+                    narrativeHiddenText.classList.toggle('expanded');
+                    if (narrativeHiddenText.classList.contains('expanded')) {
+                        narrativeDemoBtn.textContent = 'Sembunyikan';
+                    } else {
+                        narrativeDemoBtn.textContent = 'Baca Lebih Lanjut';
+                    }
+                });
+            }
         });
     </script>
 </body>
