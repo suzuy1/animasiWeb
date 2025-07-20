@@ -20,7 +20,19 @@
             font-family: 'Inter', sans-serif;
             background-color: #1A1A2E; /* Deep Indigo */
             color: #E0E0E0; /* Light Gray */
+            /* Subtle background gradient animation */
+            background-image: linear-gradient(45deg, #1A1A2E, #2C2C4A, #1A1A2E);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
+            cursor: none; /* Hide default cursor */
         }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
         .chart-container {
             position: relative;
             width: 100%;
@@ -143,41 +155,121 @@
             transform: scale(1.1);
             transition: transform 0.2s ease-in-out;
         }
+
+        /* Parallax section specific styles */
+        .parallax-background {
+            background-image: url('https://placehold.co/1920x1080/000000/FFFFFF/png?text=Parallax+Background');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed; /* This is the core of the parallax effect */
+        }
+
+        /* Simple Animation Demo Box styles */
+        #animated-box {
+            transition: transform 0.5s ease-in-out, opacity 0.5s ease-in-out;
+        }
+        #animated-box.moved {
+            transform: translateX(100px);
+        }
+        #animated-box.faded {
+            opacity: 0.2;
+        }
+        #animated-box.scaled {
+            transform: scale(1.5);
+        }
+
+        /* Custom Cursor styles */
+        #custom-cursor {
+            position: fixed;
+            width: 20px;
+            height: 20px;
+            background-color: #FF8C42; /* Vibrant Orange */
+            border-radius: 50%;
+            pointer-events: none; /* Allows clicks to pass through */
+            z-index: 9999;
+            transform: translate(-50%, -50%); /* Center the cursor */
+            transition: transform 0.1s ease-out, background-color 0.1s ease-out; /* Smooth follow and color change */
+            mix-blend-mode: difference; /* Blends with background for cool effect */
+        }
+        body:hover #custom-cursor {
+            opacity: 1; /* Show cursor on hover over body */
+        }
+        body:not(:hover) #custom-cursor {
+            opacity: 0; /* Hide cursor when mouse leaves body */
+        }
+        a:hover ~ #custom-cursor,
+        button:hover ~ #custom-cursor,
+        .cursor-interactive:hover ~ #custom-cursor {
+            transform: translate(-50%, -50%) scale(1.5); /* Enlarge on interactive elements */
+            background-color: #E0E0E0; /* Change color on interactive elements */
+        }
+
+        /* SVG Scroll Animation */
+        #svg-animation-container {
+            opacity: 0;
+            transform: translateY(50px);
+            transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+        }
+        #svg-animation-container.is-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        #svg-circle {
+            transform-origin: center center; /* Ensure scaling from center */
+            transform: scale(0); /* Start hidden */
+            transition: transform 1s cubic-bezier(0.68, -0.55, 0.27, 1.55); /* Bounce effect */
+        }
+        #svg-animation-container.is-visible #svg-circle {
+            transform: scale(1); /* Scale to full size */
+        }
     </style>
 </head>
 <body class="antialiased">
 
     <header id="header" class="sticky top-0 z-50 bg-gray-900/80 backdrop-blur-lg shadow-sm">
         <div class="container mx-auto px-4">
-            <nav class="flex justify-between items-center py-7">
-                <a href="#hero" class="text-3xl font-bold text-gray-100">Animasi<span class="text-orange-500">Web</span></a>
+            <nav class="flex justify-between items-center py-4">
+                <a href="#hero" class="text-xl font-bold text-gray-100 cursor-interactive">Animasi<span class="text-orange-500">Web</span></a>
                 <div class="hidden md:flex space-x-8">
-                    <a href="#why" class="nav-link text-gray-300 font-semibold hover:text-orange-500">Mengapa</a>
-                    <a href="#trends" class="nav-link text-gray-300 font-semibold hover:text-orange-500">Tren</a>
-                    <a href="#toolbox" class="nav-link text-gray-300 font-semibold hover:text-orange-500">Peralatan</a>
-                    <a href="#inspiration" class="nav-link text-gray-300 font-semibold hover:text-orange-500">Inspirasi</a>
-                    <a href="#best-practices" class="nav-link text-gray-300 font-semibold hover:text-orange-500">Praktik Terbaik</a>
+                    <a href="#why" class="nav-link text-gray-300 font-semibold hover:text-orange-500 cursor-interactive">Mengapa</a>
+                    <a href="#simple-animation-demo" class="nav-link text-gray-300 font-semibold hover:text-orange-500 cursor-interactive">Demo</a>
+                    <a href="#svg-scroll-animation" class="nav-link text-gray-300 font-semibold hover:text-orange-500 cursor-interactive">SVG Animasi</a>
+                    <a href="#trends" class="nav-link text-gray-300 font-semibold hover:text-orange-500 cursor-interactive">Tren</a>
+                    <a href="#toolbox" class="nav-link text-gray-300 font-semibold hover:text-orange-500 cursor-interactive">Peralatan</a>
+                    <a href="#inspiration" class="nav-link text-gray-300 font-semibold hover:text-orange-500 cursor-interactive">Inspirasi</a>
+                    <a href="#best-practices" class="nav-link text-gray-300 font-semibold hover:text-orange-500 cursor-interactive">Praktik Terbaik</a>
                 </div>
-                <button id="mobile-menu-button" class="md:hidden text-gray-100">
+                <button id="mobile-menu-button" class="md:hidden text-gray-100 cursor-interactive">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
                 </button>
             </nav>
         </div>
         <div id="mobile-menu" class="md:hidden bg-gray-900/90 backdrop-blur-lg">
-            <a href="#why" class="block py-2 px-4 text-sm text-gray-300 hover:bg-gray-800">Mengapa</a>
-            <a href="#trends" class="block py-2 px-4 text-sm text-gray-300 hover:bg-gray-800">Tren</a>
-            <a href="#toolbox" class="block py-2 px-4 text-sm text-gray-300 hover:bg-gray-800">Peralatan</a>
-            <a href="#inspiration" class="block py-2 px-4 text-sm text-gray-300 hover:bg-gray-800">Inspirasi</a>
-            <a href="#best-practices" class="block py-2 px-4 text-sm text-gray-300 hover:bg-gray-800">Praktik Terbaik</a>
+            <a href="#why" class="block py-2 px-4 text-sm text-gray-300 hover:bg-gray-800 cursor-interactive">Mengapa</a>
+            <a href="#simple-animation-demo" class="block py-2 px-4 text-sm text-gray-300 hover:bg-gray-800 cursor-interactive">Demo</a>
+            <a href="#svg-scroll-animation" class="block py-2 px-4 text-sm text-gray-300 hover:bg-gray-800 cursor-interactive">SVG Animasi</a>
+            <a href="#trends" class="block py-2 px-4 text-sm text-gray-300 hover:bg-gray-800 cursor-interactive">Tren</a>
+            <a href="#toolbox" class="block py-2 px-4 text-sm text-gray-300 hover:bg-gray-800 cursor-interactive">Peralatan</a>
+            <a href="#inspiration" class="block py-2 px-4 text-sm text-gray-300 hover:bg-gray-800 cursor-interactive">Inspirasi</a>
+            <a href="#best-practices" class="block py-2 px-4 text-sm text-gray-300 hover:bg-gray-800 cursor-interactive">Praktik Terbaik</a>
         </div>
     </header>
 
     <main class="container mx-auto px-4 py-8 md:py-16">
         <section id="hero" class="text-center min-h-[60vh] flex flex-col justify-center items-center">
-            <h1 id="typing-hero-title" class="text-5xl md:text-6xl font-bold mb-3 leading-tight hero-title"></h1>
+            <h1 id="typing-hero-title" class="text-4xl md:text-6xl font-bold mb-4 leading-tight hero-title"></h1>
             <p class="text-lg md:text-xl max-w-3xl text-gray-400 hero-paragraph">
                 Jelajahi bagaimana animasi web modern mengubah situs statis menjadi pengalaman digital yang hidup, menarik, dan tak terlupakan.
             </p>
+        </section>
+
+        <!-- New Parallax Section -->
+        <section id="parallax-section" class="relative h-[50vh] flex items-center justify-center text-white overflow-hidden my-16 rounded-xl shadow-lg">
+            <div class="absolute inset-0 parallax-background"></div>
+            <div class="relative z-10 text-center p-4 bg-black bg-opacity-50 rounded-lg">
+                <h2 class="text-4xl md:text-5xl font-bold mb-2">Pengalaman Mendalam</h2>
+                <p class="text-lg md:text-xl max-w-2xl mx-auto">Rasakan kedalaman visual dengan efek parallax scrolling.</p>
+            </div>
         </section>
 
         <section id="why" class="py-16 fade-in-section">
@@ -187,23 +279,23 @@
             </div>
             <div class="grid md:grid-cols-3 gap-8">
                 <!-- Meningkatkan Keterlibatan Card -->
-                <div class="bg-gray-800 p-8 rounded-3xl shadow-lg hover:shadow-xl transition-shadow duration-300 text-center transform hover:-translate-y-2">
+                <div class="bg-gray-800 p-8 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 text-center transform hover:-translate-y-2">
                     <div class="text-4xl mb-4 text-orange-500"><i class="fa-solid fa-star"></i></div>
                     <h3 class="text-xl font-bold mb-2 text-gray-100">Meningkatkan Keterlibatan</h3>
                     <p class="text-gray-400">Gerakan secara alami menarik perhatian, memandu pengguna, dan mendorong interaksi yang lebih dalam dengan konten Anda.</p>
                     <div class="mt-4">
-                        <button id="engagement-demo-btn" class="bg-orange-500 text-white px-6 py-2 rounded-full font-semibold hover:bg-orange-600 demo-button">
+                        <button id="engagement-demo-btn" class="bg-orange-500 text-white px-6 py-2 rounded-full font-semibold hover:bg-orange-600 demo-button cursor-interactive">
                             Coba Interaksi!
                         </button>
                     </div>
                 </div>
                 <!-- Membangun Narasi Card -->
-                <div class="bg-gray-800 p-8 rounded-3xl shadow-lg hover:shadow-xl transition-shadow duration-300 text-center transform hover:-translate-y-2">
+                <div class="bg-gray-800 p-8 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 text-center transform hover:-translate-y-2">
                     <div class="text-4xl mb-4 text-orange-500"><i class="fa-solid fa-scroll"></i></div>
                     <h3 class="text-xl font-bold mb-2 text-gray-100">Membangun Narasi</h3>
                     <p class="text-gray-400">Gunakan animasi berbasis gulir (*scrollytelling*) untuk memandu pengguna melalui sebuah cerita, mengungkapkan informasi secara bertahap dan imersif.</p>
                     <div class="mt-4">
-                        <button id="narrative-demo-btn" class="bg-gray-700 text-gray-200 px-6 py-2 rounded-full font-semibold hover:bg-gray-600 demo-button">
+                        <button id="narrative-demo-btn" class="bg-gray-700 text-gray-200 px-6 py-2 rounded-full font-semibold hover:bg-gray-600 demo-button cursor-interactive">
                             Baca Lebih Lanjut
                         </button>
                         <p id="narrative-hidden-text" class="hidden-text text-gray-400 text-sm mt-2">
@@ -212,15 +304,49 @@
                     </div>
                 </div>
                 <!-- Memperkuat Merek Card -->
-                <div class="bg-gray-800 p-8 rounded-3xl shadow-lg hover:shadow-xl transition-shadow duration-300 text-center transform hover:-translate-y-2">
+                <div class="bg-gray-800 p-8 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 text-center transform hover:-translate-y-2">
                     <div class="text-4xl mb-4 text-orange-500">
-                        <i class="fa-solid fa-palette demo-icon-spin"></i>
+                        <i class="fa-solid fa-palette demo-icon-spin cursor-interactive"></i>
                     </div>
                     <h3 class="text-xl font-bold mb-2 text-gray-100">Memperkuat Merek</h3>
                     <p class="text-gray-400">Animasi yang khas dan konsisten menciptakan identitas merek yang mudah diingat dan menonjol di tengah keramaian digital.</p>
                     <div class="mt-4 text-gray-400 text-sm">
                         *Arahkan kursor ke ikon di atas!*
                     </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- New Simple Animation Demo Section -->
+        <section id="simple-animation-demo" class="py-16 fade-in-section">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold mb-2 section-title">Coba Animasi Sederhana!</h2>
+                <p class="text-lg text-gray-400 max-w-2xl mx-auto">Interaksikan dengan kotak di bawah ini untuk melihat animasi dasar beraksi.</p>
+            </div>
+            <div class="flex flex-col items-center justify-center bg-gray-800 p-8 rounded-xl shadow-lg">
+                <div id="animated-box" class="w-24 h-24 bg-orange-500 rounded-lg mb-8 transition-all duration-500 ease-in-out flex items-center justify-center text-white font-bold text-lg">
+                    Kotak
+                </div>
+                <div class="flex flex-wrap justify-center gap-4">
+                    <button id="move-btn" class="bg-blue-600 text-white px-6 py-2 rounded-full font-semibold hover:bg-blue-700 demo-button cursor-interactive">Pindah</button>
+                    <button id="fade-btn" class="bg-purple-600 text-white px-6 py-2 rounded-full font-semibold hover:bg-purple-700 demo-button cursor-interactive">Pudar</button>
+                    <button id="scale-btn" class="bg-green-600 text-white px-6 py-2 rounded-full font-semibold hover:bg-green-700 demo-button cursor-interactive">Perbesar</button>
+                    <button id="reset-btn" class="bg-gray-600 text-white px-6 py-2 rounded-full font-semibold hover:bg-gray-700 demo-button cursor-interactive">Reset</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- New SVG Scroll Animation Section -->
+        <section id="svg-scroll-animation" class="py-16 fade-in-section">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold mb-2 section-title">Animasi SVG yang Dipicu Gulir</h2>
+                <p class="text-lg text-gray-400 max-w-2xl mx-auto">Gulir ke bawah untuk melihat elemen SVG muncul dengan animasi.</p>
+            </div>
+            <div class="flex justify-center items-center bg-gray-800 p-8 rounded-xl shadow-lg h-64">
+                <div id="svg-animation-container" class="w-48 h-48 flex items-center justify-center">
+                    <svg width="100%" height="100%" viewBox="0 0 100 100">
+                        <circle id="svg-circle" cx="50" cy="50" r="40" fill="#FF8C42" stroke="#E0E0E0" stroke-width="2"/>
+                    </svg>
                 </div>
             </div>
         </section>
@@ -242,19 +368,19 @@
                 <h3 class="text-2xl font-bold mb-4 section-title">Tren Eksperimental & Masa Depan</h3>
                 <p class="text-lg text-gray-400 max-w-2xl mx-auto mb-6">Masa depan animasi web dipenuhi inovasi. Berikut beberapa tren eksperimental yang patut diperhatikan:</p>
                 <div class="grid md:grid-cols-2 gap-8">
-                    <div class="bg-gray-800 p-6 rounded-3xl shadow-md">
+                    <div class="bg-gray-800 p-6 rounded-lg shadow-md">
                         <h4 class="font-bold text-xl mb-2 text-gray-100 flex items-center"><span class="mr-2 text-2xl text-orange-500"><i class="fa-solid fa-robot"></i></span> Alur Kerja Animasi Berbasis AI</h4>
                         <p class="text-gray-400">AI mengotomatiskan tugas-tugas berulang seperti *in-betweening* dan *lip-syncing*, mempercepat alur kerja dan memberikan kebebasan kreatif lebih besar kepada seniman. Ini memungkinkan animator berfokus pada visi kreatif, sementara AI menangani aspek teknis yang padat karya.</p>
                     </div>
-                    <div class="bg-gray-800 p-6 rounded-3xl shadow-md">
+                    <div class="bg-gray-800 p-6 rounded-lg shadow-md">
                         <h4 class="font-bold text-xl mb-2 text-gray-100 flex items-center"><span class="mr-2 text-2xl text-orange-500"><i class="fa-solid fa-bag-shopping"></i></span> Animasi Interaktif & Dapat Dibeli</h4>
                         <p class="text-gray-400">Animasi dengan *hotspot* yang dapat diklik, fungsionalitas langsung ke keranjang belanja, atau alur cerita bercabang untuk e-commerce. Ini mengubah penonton pasif menjadi partisipan aktif, meningkatkan keterlibatan dan potensi konversi.</p>
                     </div>
-                    <div class="bg-gray-800 p-6 rounded-3xl shadow-md">
+                    <div class="bg-gray-800 p-6 rounded-lg shadow-md">
                         <h4 class="font-bold text-xl mb-2 text-gray-100 flex items-center"><span class="mr-2 text-2xl text-orange-500"><i class="fa-solid fa-chart-line"></i></span> Animasi Data Langsung</h4>
                         <p class="text-gray-400">Memvisualisasikan data *real-time* secara dinamis, seperti grafik saham di dasbor keuangan atau ketersediaan produk di platform e-commerce. Ini memberikan informasi yang selalu terbarui dan relevan secara visual.</p>
                     </div>
-                     <div class="bg-gray-800 p-6 rounded-3xl shadow-md">
+                     <div class="bg-gray-800 p-6 rounded-lg shadow-md">
                         <h4 class="font-bold text-xl mb-2 text-gray-100 flex items-center"><span class="mr-2 text-2xl text-orange-500"><i class="fa-solid fa-mobile-screen-button"></i></span> Format Video Vertikal</h4>
                         <p class="text-gray-400">Merancang animasi khusus untuk rasio aspek 9:16, dioptimalkan untuk konsumsi *mobile-first*. Ini mengakomodasi kebiasaan pengguna modern yang lebih banyak mengakses konten melalui perangkat seluler.</p>
                     </div>
@@ -269,9 +395,9 @@
             </div>
             <div>
                 <div class="flex justify-center border-b border-gray-700 mb-8">
-                    <button data-tab="css" class="tab-button py-2 px-6 text-lg font-semibold border-b-2 border-orange-500 text-orange-400">CSS</button>
-                    <button data-tab="js" class="tab-button py-2 px-6 text-lg font-semibold border-b-2 border-transparent text-gray-400 hover:text-orange-400">JavaScript</button>
-                    <button data-tab="webgl" class="tab-button py-2 px-6 text-lg font-semibold border-b-2 border-transparent text-gray-400 hover:text-orange-400">WebGL/3D</button>
+                    <button data-tab="css" class="tab-button py-2 px-6 text-lg font-semibold border-b-2 border-orange-500 text-orange-400 cursor-interactive">CSS</button>
+                    <button data-tab="js" class="tab-button py-2 px-6 text-lg font-semibold border-b-2 border-transparent text-gray-400 hover:text-orange-400 cursor-interactive">JavaScript</button>
+                    <button data-tab="webgl" class="tab-button py-2 px-6 text-lg font-semibold border-b-2 border-transparent text-gray-400 hover:text-orange-400 cursor-interactive">WebGL/3D</button>
                 </div>
                 <div id="tab-content">
                 </div>
@@ -351,9 +477,12 @@
     </div>
 
     <!-- Back to Top Button -->
-    <button id="back-to-top" class="fixed bottom-6 right-6 bg-orange-500 text-white p-3 rounded-full shadow-lg opacity-0 pointer-events-none transform translate-y-4 hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-opacity-75">
+    <button id="back-to-top" class="fixed bottom-6 right-6 bg-orange-500 text-white p-3 rounded-full shadow-lg opacity-0 pointer-events-none transform translate-y-4 hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-opacity-75 cursor-interactive">
         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"></path></svg>
     </button>
+
+    <!-- Custom Cursor Element -->
+    <div id="custom-cursor"></div>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
@@ -766,6 +895,67 @@
                         narrativeDemoBtn.textContent = 'Baca Lebih Lanjut';
                     }
                 });
+            }
+
+            // Simple Animation Demo Logic
+            const animatedBox = document.getElementById('animated-box');
+            const moveBtn = document.getElementById('move-btn');
+            const fadeBtn = document.getElementById('fade-btn');
+            const scaleBtn = document.getElementById('scale-btn');
+            const resetBtn = document.getElementById('reset-btn');
+
+            if (animatedBox && moveBtn && fadeBtn && scaleBtn && resetBtn) {
+                moveBtn.addEventListener('click', () => {
+                    animatedBox.classList.toggle('moved');
+                });
+
+                fadeBtn.addEventListener('click', () => {
+                    animatedBox.classList.toggle('faded');
+                });
+
+                scaleBtn.addEventListener('click', () => {
+                    animatedBox.classList.toggle('scaled');
+                });
+
+                resetBtn.addEventListener('click', () => {
+                    animatedBox.classList.remove('moved', 'faded', 'scaled');
+                });
+            }
+
+            // Custom Cursor Logic
+            const customCursor = document.getElementById('custom-cursor');
+            if (customCursor) {
+                document.body.addEventListener('mousemove', (e) => {
+                    customCursor.style.left = `${e.clientX}px`;
+                    customCursor.style.top = `${e.clientY}px`;
+                });
+
+                // Add a class to interactive elements to trigger cursor change
+                document.querySelectorAll('a, button, .cursor-interactive').forEach(el => {
+                    el.addEventListener('mouseenter', () => {
+                        customCursor.classList.add('hovering');
+                    });
+                    el.addEventListener('mouseleave', () => {
+                        customCursor.classList.remove('hovering');
+                    });
+                });
+            }
+
+            // SVG Scroll Animation Logic
+            const svgAnimationContainer = document.getElementById('svg-animation-container');
+            if (svgAnimationContainer) {
+                const svgObserver = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            entry.target.classList.add('is-visible');
+                        } else {
+                            // Optional: remove class when out of view if you want to re-trigger on scroll back
+                            entry.target.classList.remove('is-visible');
+                        }
+                    });
+                }, { threshold: 0.5 }); // Trigger when 50% of the element is visible
+
+                svgObserver.observe(svgAnimationContainer);
             }
         });
     </script>
