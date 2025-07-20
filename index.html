@@ -1,0 +1,96 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web Animation Showcase</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @keyframes blink-caret {
+            from, to { border-color: transparent }
+            50% { border-color: orange; }
+        }
+        
+        .bg-gradient-animated {
+            background: linear-gradient(-45deg, #0f0c29, #302b63, #24243e);
+            background-size: 400% 400%;
+            animation: gradient 15s ease infinite;
+        }
+
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .transform-origin-center {
+            transform-origin: center;
+        }
+
+        .reduce-motion .transform-disabled {
+            transform: none !important;
+        }
+        
+        .transform-disabled:hover {
+            transform: none !important;
+        }
+
+        .reduce-motion .animate-spin-on-hover:hover {
+             animation: none;
+        }
+
+        .animate-spin-on-hover:hover {
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+          from {
+            transform: rotate(0deg);
+          }
+          to {
+            transform: rotate(360deg);
+          }
+        }
+
+        .nav-link:hover .after, .nav-link:focus .after {
+            width: 100%;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+        body {
+            color: #E0E0E0;
+        }
+
+        .reduce-motion *,
+        .reduce-motion *::before,
+        .reduce-motion *::after {
+            animation-delay: -1ms !important;
+            animation-duration: 1ms !important;
+            animation-iteration-count: 1 !important;
+            background-attachment: initial !important;
+            scroll-behavior: auto !important;
+            transition-duration: 0s !important;
+            transition-delay: 0s !important;
+        }
+    </style>
+<script type="importmap">
+{
+  "imports": {
+    "react": "https://esm.sh/react@^19.1.0",
+    "react-dom/": "https://esm.sh/react-dom@^19.1.0/",
+    "react/": "https://esm.sh/react@^19.1.0/",
+    "recharts": "https://esm.sh/recharts@^3.1.0",
+    "@google/genai": "https://esm.sh/@google/genai"
+  }
+}
+</script>
+<link rel="stylesheet" href="/index.css">
+</head>
+<body class="bg-gray-900">
+    <div id="root"></div>
+<script type="module" src="/index.tsx"></script>
+</body>
+</html>

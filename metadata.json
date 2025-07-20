@@ -1,0 +1,5 @@
+{
+  "name": "Web Animation Showcase",
+  "description": "An interactive single-page application built with React and Tailwind CSS to demonstrate the power and techniques of modern web animations.",
+  "requestFramePermissions": []
+}
